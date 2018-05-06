@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-//import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import * as BooksAPI from './BooksAPI'
-//import escapeRegExp from 'escape-string-regexp'
-//import sortBy from 'sort-by'
 
 class ListBooks extends Component {
   constructor(props) {
@@ -42,19 +39,20 @@ class ListBooks extends Component {
     let showingBooks
     showingBooks = books.filter((book) => 
       {
-        if (bookShelfName.match(book.shelf)) {
+        console.log(bookShelfName)
+        console.log(book.shelf)
+        if (book.shelf != null && bookShelfName.match(book.shelf)) {
           return book
         }
       }
     )
 
 
-    //showingContacts.sort(sortBy('name'))
 
     return (
       <div className="bookshelf-books">
         <ol className="books-grid">
-          {showingBooks.map((book) => (
+          {showingBooks.length > 0 && showingBooks.map((book) => (
             <li key={book.id} className='list-books-content '>
               <div className="book">
                 <div className="book-top">
@@ -62,7 +60,7 @@ class ListBooks extends Component {
                     style={{ width: 128, height: 193, 
                     backgroundImage: `url(${book.imageLinks.thumbnail})`}}></div>
                   <div className="book-shelf-changer">
-                    <select value={book.shelf} onChange={this.onChangeShelf} data-book-id={book.id}>
+                    <select value={book.shelf != null ? book.shelf : "none"} onChange={this.onChangeShelf} data-book-id={book.id}>
                       <option value="none" disabled>Move to...</option>
                       <option value="currentlyReading">Currently Reading</option>
                       <option value="wantToRead">Want to Read</option>
@@ -72,7 +70,7 @@ class ListBooks extends Component {
                   </div>
                 </div>
                 <div className="book-title">{book.title}</div>
-                {book.authors.map((author) => (
+                {book.authors != null && book.authors.map((author) => (
                   <div key={author} className="book-authors">{author}</div>
                 ))}
               </div>
