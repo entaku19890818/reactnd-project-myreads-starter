@@ -17,10 +17,31 @@ class Shelfs extends React.Component {
   }
 
   componentDidMount() {
-    
+    this.getBooksAll()
+
+
+  }
+  getBooksAll() {
     BooksAPI.getAll().then((books) => {
       this.setState({ books })
       console.log(books)
+    })
+
+  }
+
+
+
+  onChangeShelf = (event) => {
+    let bookId = event.currentTarget.getAttribute('data-book-id')
+    let shelf = event.target.value
+
+    
+    BooksAPI.get(bookId).then((book)=> {
+      console.log(book)
+      BooksAPI.update(book, shelf).then((res)=> {
+        console.log(res)
+        this.getBooksAll()
+      })
     })
 
   }
@@ -43,6 +64,7 @@ class Shelfs extends React.Component {
                     <ListBooks
                       books={this.state.books}
                       bookShelfName={bookShelf}
+                      onChangeShelf={this.onChangeShelf}
                     />
                  </div>
               ))}

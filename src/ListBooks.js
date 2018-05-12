@@ -9,28 +9,15 @@ class ListBooks extends Component {
       bookId: '',
     };
 
-    this.onChangeShelf = this.onChangeShelf.bind(this);
+   // this.onChangeShelf = this.onChangeShelf.bind(this);
   }
 
   static propTypes = {
     books: PropTypes.array.isRequired,
-    bookShelfName: PropTypes.array.isRequired,
+    bookShelfName: PropTypes.string.isRequired,
   }
 
-  onChangeShelf = (event) => {
-    let bookId = event.currentTarget.getAttribute('data-book-id')
-    let shelf = event.target.value
 
-    
-    BooksAPI.get(bookId).then((book)=> {
-      console.log(book)
-      BooksAPI.update(book, shelf).then((res)=> {
-        console.log(res)
-      })
-    })
-
-     
-  }
 
   render() {
     const { books, bookShelfName} = this.props
@@ -60,7 +47,7 @@ class ListBooks extends Component {
                     style={{ width: 128, height: 193, 
                     backgroundImage: `url(${book.imageLinks.thumbnail})`}}></div>
                   <div className="book-shelf-changer">
-                    <select value={book.shelf != null ? book.shelf : "none"} onChange={this.onChangeShelf} data-book-id={book.id}>
+                    <select value={book.shelf != null ? book.shelf : "none"} onChange={this.props.onChangeShelf} data-book-id={book.id}>
                       <option value="none" disabled>Move to...</option>
                       <option value="currentlyReading">Currently Reading</option>
                       <option value="wantToRead">Want to Read</option>
