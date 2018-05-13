@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import escapeRegExp from 'escape-string-regexp'
 import * as BooksAPI from './BooksAPI'
+import ListBooks from './ListBooks'
 
 
 class SearchBooks extends Component {
@@ -10,10 +11,44 @@ class SearchBooks extends Component {
 
   state = {
     query: '',
-    showingBooks:[]
+    showingBooks:[],
+    isNoResult : false
   }
 
 
+
+
+
+  onSearchBook = (query) => {
+      BooksAPI.search(query).then((books)=> {
+        console.log("showingBooks")
+        console.log(books)
+        if (!books || books.error == "empty query"){
+          this.setState({ showingBooks: [], isNoResult:true})
+
+        }else{
+          this.setState({ showingBooks: books, isNoResult:false})
+        }
+      })
+      this.getMyBooks()
+
+  }
+
+  getMyBooks = () =>  {
+    BooksAPI.getAll().then((books) => {
+
+      books.forEach((book, i, books) => {
+        const showingBooks = this.state.showingBooks.slice()
+        showingBooks.forEach((showingBook, j, showingBooks) => {
+          if(book.id == showingBook.id){
+            showingBooks[j] = book
+            this.setState({ showingBooks: showingBooks })
+          }
+        })
+      })
+
+    })
+  }
 
   onChangeShelf = (event) => {
     let bookId = event.currentTarget.getAttribute('data-book-id')
@@ -21,37 +56,17 @@ class SearchBooks extends Component {
 
     
     BooksAPI.get(bookId).then((book)=> {
-      console.log(book)
       BooksAPI.update(book, shelf).then((res)=> {
-        console.log(res)
+        this.getMyBooks()
       })
     })
-
-     
-  }
-
-  onSearchBook = (query) => {
-    console.log(query)
-
-    
-      BooksAPI.search(query).then((books)=> {
-        console.log(books)
-        if (books.error == "empty query"){
-          this.setState({ showingBooks: [] })
-        }else{
-          this.setState({ showingBooks: books })
-        }
-        
-      })
-    
-
-     
   }
 
   render() {
 
 
     const { query,showingBooks } = this.state    
+    const bookShelfs = ["currentlyReading","wantToRead","read","none"]
 
     return (
         <div className="search-books">
@@ -70,37 +85,27 @@ class SearchBooks extends Component {
               placeholder="Search by title or author" 
               onChange={(event) => this.onSearchBook(event.target.value)}
               />
-
           </div>
         </div>
         
         <div className="search-books-results">
-          <ol className="books-grid">
-          {showingBooks.length > 0 && showingBooks.map((book) => (
-            <li key={book.id} className='list-books-content '>
-              <div className="book">
-                <div className="book-top">
-                  <div className="book-cover" 
-                    style={{ width: 128, height: 193, 
-                    backgroundImage: `url(${book.imageLinks.thumbnail})`}}></div>
-                  <div className="book-shelf-changer">
-                    <select value={book.shelf != null ? book.shelf : "none"} onChange={this.onChangeShelf} data-book-id={book.id}>
-                      <option value="none" disabled>Move to...</option>
-                      <option value="currentlyReading">Currently Reading</option>
-                      <option value="wantToRead">Want to Read</option>
-                      <option value="read">Read</option>
-                      <option value="none">None</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="book-title">{book.title}</div>
-                {book.authors != null && book.authors.map((author) => (
-                  <div key={author} className="book-authors">{author}</div>
-                ))}
-              </div>
-            </li>
+
+          <div className="list-books-content">
+          {bookShelfs.map((bookShelf) => (
+          <div key={bookShelf} className="bookshelf">
+            <h2 className="bookshelf-title">{bookShelf}</h2>
+            <ListBooks
+              books={this.state.showingBooks}
+              bookShelfName={bookShelf}
+              onChangeShelf={this.onChangeShelf}
+            />
+          </div>
           ))}
-          </ol>
+
+          {(() => {
+            return this.state.isNoResult ? <div>no result found</div> : null;
+          })()}
+          </div>
         </div>
       </div>
     )

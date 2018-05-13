@@ -15,8 +15,8 @@ class ListBooks extends Component {
   static propTypes = {
     books: PropTypes.array.isRequired,
     bookShelfName: PropTypes.string.isRequired,
+    onChangeShelf: PropTypes.func
   }
-
 
 
   render() {
@@ -26,9 +26,9 @@ class ListBooks extends Component {
     let showingBooks
     showingBooks = books.filter((book) => 
       {
-        console.log(bookShelfName)
-        console.log(book.shelf)
         if (book.shelf != null && bookShelfName.match(book.shelf)) {
+          return book
+        }else if(book.shelf == null && bookShelfName == "none"){
           return book
         }
       }
@@ -50,7 +50,10 @@ class ListBooks extends Component {
                       : { width: 128, height: 193, backgroundImage: `url('./icons/question.svg')`}
                     }></div>
                   <div className="book-shelf-changer">
-                    <select value={book.shelf != null ? book.shelf : "none"} onChange={this.props.onChangeShelf} data-book-id={book.id}>
+                    <select value={book.shelf != null ? book.shelf : "none"} 
+                      onChange={this.props.onChangeShelf} 
+                      data-book-id={book.id}
+                    >
                       <option value="none" disabled>Move to...</option>
                       <option value="currentlyReading">Currently Reading</option>
                       <option value="wantToRead">Want to Read</option>
