@@ -44,8 +44,11 @@ class ListBooks extends Component {
               <div className="book">
                 <div className="book-top">
                   <div className="book-cover" 
-                    style={{ width: 128, height: 193, 
-                    backgroundImage: `url(${book.imageLinks.thumbnail})`}}></div>
+                    style={
+                      book.imageLinks.thumbnail != null ? 
+                      { width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})`}
+                      : { width: 128, height: 193, backgroundImage: `url('./icons/question.svg')`}
+                    }></div>
                   <div className="book-shelf-changer">
                     <select value={book.shelf != null ? book.shelf : "none"} onChange={this.props.onChangeShelf} data-book-id={book.id}>
                       <option value="none" disabled>Move to...</option>
